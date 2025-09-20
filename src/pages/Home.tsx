@@ -4,6 +4,7 @@ import { parseProductsFile } from '../lib/csv';
 import ProductGrid from '../features/products/ProductGrid';
 import CartPage from '../features/cart/CartPage';
 import sampleUrl from '../data/products.csv?url';
+import logoUrl from '../assets/whitelabel_loyalty_logo.jpeg';
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -30,7 +31,10 @@ export default function Home() {
         <div className="min-h-dvh">
             <header className="border-b">
                 <div className="mx-auto max-w-7xl p-4 flex items-center gap-4">
-                    <h1 className="text-xl font-bold">White Label Loyalty</h1>
+                    <div className="flex items-center gap-3">
+                        <img src={logoUrl} alt="White Label Loyalty" className="h-20 w-20 object-contain" />
+                        <h1 className="text-xl font-bold">White Label Loyalty</h1>
+                    </div>
                     <div className="ml-auto flex items-center gap-3">
                         <input className="input w-64" placeholder="Search products…" value={query}
                             onChange={e => setQuery(e.target.value)} aria-label="Search products" />
