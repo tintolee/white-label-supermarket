@@ -8,4 +8,5 @@ export type Product = {
     image?: string;
     category?: string;
     promotion?: string;
+    description?: string;
 };

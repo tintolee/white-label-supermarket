@@ -35,6 +35,7 @@ function normalize(rows: any[]): Product[] {
             image: String(r.image ?? r.Image ?? ''),
             category: String(r.category ?? r.Category ?? '').trim() || undefined,
             promotion: String(r.promotion ?? r.Promotion ?? '').trim() || undefined,
+            description: String(r.description ?? r.Description ?? '').trim() || undefined,
         };
     }).filter(p => p.name);
 }
