@@ -15,11 +15,23 @@ export default function ProductCard({ p }: { readonly p: Product }) {
                 }`}
             aria-label={`Add ${p.name} to order`}
         >
-            <div className="relative">
+            <div className="relative h-40 w-full rounded bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden">
                 <img
                     src={p.image || '/placeholder.png'}
                     alt={p.name}
-                    className="h-40 w-full object-contain rounded bg-gray-50"
+                    className="h-full w-full object-contain"
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                            parent.style.fontSize = '14px';
+                            parent.style.color = '#6b7280';
+                            parent.style.textAlign = 'center';
+                            parent.style.padding = '1rem';
+                            parent.textContent = p.name;
+                        }
+                    }}
                 />
                 {p.promotion === 'BOGOF' && (
                     <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg transform rotate-12 animate-pulse hover:animate-bounce">
