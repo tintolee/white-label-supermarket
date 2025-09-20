@@ -46,15 +46,7 @@ export default function Input({
                 <input
                     id={inputId}
                     value={value}
-                    className={`
-            w-full ${BORDERS.input} rounded-xl shadow-sm transition-all duration-200 text-slate-900 placeholder-slate-400
-            focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            ${startIcon ? 'pl-10' : 'pl-3'} 
-            ${hasClearButton || endIcon ? 'pr-10' : 'pr-3'} 
-            py-2 md:py-3
-            ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}
-            ${className}
-          `}
+                    className={`w-full ${BORDERS.input} rounded-xl bg-white shadow-sm transition-all duration-200 text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${startIcon ? 'pl-10' : 'pl-3'} ${hasClearButton || endIcon ? 'pr-10' : 'pr-3'} py-2 md:py-3 ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''} ${className}`}
                     {...props}
                 />
 
