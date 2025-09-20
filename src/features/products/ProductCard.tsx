@@ -13,11 +13,18 @@ export default function ProductCard({ p }: { p: Product }) {
                 }`}
             aria-label={`Add ${p.name} to order`}
         >
-            <img
-                src={p.image || '/placeholder.png'}
-                alt={p.name}
-                className="h-40 w-full object-contain rounded bg-gray-50"
-            />
+            <div className="relative">
+                <img
+                    src={p.image || '/placeholder.png'}
+                    alt={p.name}
+                    className="h-40 w-full object-contain rounded bg-gray-50"
+                />
+                {p.promotion === 'BOGOF' && (
+                    <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg transform rotate-12">
+                        BUY 1 GET 1 FREE!
+                    </div>
+                )}
+            </div>
             {p.category && (
                 <span className="mt-2 inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full w-fit">
                     {p.category}
