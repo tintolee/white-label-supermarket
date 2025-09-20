@@ -2,3 +2,4 @@ id,name,price,salePrice,unit,stock,description,image,category,promotion
 G95,Asparagus,0.83,,each,30,Fresh green asparagus, https://picsum.photos/seed/asparagus/300/200,Veg,BOGOF
 A21,Kitty Litter,18.99,,each,24,Absorbent cat litter, https://picsum.photos/seed/rice/300/200,Pet,
 CA6,Cake,2.00,,each,12,Delicious chocolate cake, https://picsum.photos/seed/cake/300/200,Pastries,
+

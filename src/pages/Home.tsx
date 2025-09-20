@@ -18,11 +18,6 @@ export default function Home() {
         })().catch(console.error);
     }, []);
 
-    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        const f = e.target.files?.[0]; if (!f) return;
-        setProducts(await parseProductsFile(f));
-    }
-
     const filtered = query
         ? products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
         : products;
@@ -38,11 +33,9 @@ export default function Home() {
                     <div className="ml-auto flex items-center gap-3">
                         <input className="input w-64" placeholder="Search products…" value={query}
                             onChange={e => setQuery(e.target.value)} aria-label="Search products" />
-                        <label className="text-sm">
-                            <span className="mr-2">Upload CSV/XLSX</span>
-                            <input type="file" accept=".csv,.xlsx" onChange={handleUpload} className="hidden" />
-                            <span className="btn cursor-pointer">Choose file</span>
-                        </label>
+                        <a href="/admin" className="text-sm text-slate-800 hover:text-slate-600">
+                            Admin
+                        </a>
                     </div>
                 </div>
             </header>
@@ -58,7 +51,7 @@ export default function Home() {
                         {/* Logo and Company Info */}
                         <div className="col-span-1">
                             <div className="flex items-center justify-center mb-4">
-                                <img src={logoUrl} alt="White Label Loyalty" className="h-25 w-25 object-contain" />
+                                <img src={logoUrl} alt="White Label Loyalty" className="h-12 w-12 object-contain" />
                             </div>
                         </div>
 
