@@ -1,8 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer components {
-  .btn { @apply px-4 py-2 rounded border hover:opacity-90 disabled:opacity-50; }
-  .input { @apply px-3 py-2 border rounded; }
+  .btn { 
+    padding: 1rem 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    &:hover { opacity: 0.9; }
+    &:disabled { opacity: 0.5; }
+  }
+  .input { 
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    width: 100%;
+  }
 }

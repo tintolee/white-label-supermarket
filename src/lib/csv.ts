@@ -33,6 +33,7 @@ function normalize(rows: any[]): Product[] {
             unit: String(r.unit ?? r.Unit ?? 'each'),
             stock,
             image: String(r.image ?? r.Image ?? ''),
+            category: String(r.category ?? r.Category ?? '').trim() || undefined,
         };
     }).filter(p => p.name);
 }
