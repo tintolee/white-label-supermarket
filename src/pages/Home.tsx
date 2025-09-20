@@ -1,14 +1,39 @@
 import { useEffect, useState } from 'react';
+import { Search, X, ShoppingBag } from 'lucide-react';
 import type { Product } from '../types';
 import { parseProductsFile } from '../lib/csv';
 import ProductGrid from '../features/products/ProductGrid';
 import CartPage from '../features/cart/CartPage';
+import { useCart } from '../features/cart/cartStore';
+import { ToastContainer } from '../lib/toast';
 import sampleUrl from '../data/products.csv?url';
 import logoUrl from '../assets/whitelabel_loyalty_logo.jpeg';
+
+// Custom hook for debounced value
+function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
+}
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
     const [query, setQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const itemCount = useCart((s) => s.itemCount());
+
+    // Debounce search to improve performance
+    const debouncedQuery = useDebounce(query, 300);
 
     useEffect(() => {
         (async () => {
@@ -18,31 +43,110 @@ export default function Home() {
         })().catch(console.error);
     }, []);
 
-    const filtered = query
-        ? products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
-        : products;
+    const filtered = products.filter(p => {
+        const matchesQuery = !debouncedQuery || p.name.toLowerCase().includes(debouncedQuery.toLowerCase());
+        const matchesCategory = !selectedCategory || p.category === selectedCategory;
+        return matchesQuery && matchesCategory;
+    });
+
+    const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean)));
 
     return (
-        <div className="min-h-dvh">
-            <header className="border-b">
-                <div className="mx-auto max-w-7xl p-4 flex items-center gap-4">
-                    <div className="flex items-center gap-3">
-                        <img src={logoUrl} alt="White Label Loyalty" className="h-20 w-20 object-contain" />
-                        <h1 className="text-xl font-bold">White Label Loyalty</h1>
+        <div className="min-h-dvh bg-gradient-to-br from-gray-50 to-white">
+            <header className="bg-gradient-to-r from-slate-800 to-slate-900 shadow-xl border-b border-slate-700">
+                <div className="mx-auto max-w-7xl p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6">
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                        <div className="p-2 bg-white rounded-xl shadow-lg">
+                            <img src={logoUrl} alt="White Label Loyalty" className="h-12 w-12 md:h-16 md:w-16 object-contain" />
+                        </div>
+                        <div className="flex-1 md:flex-none">
+                            <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">White Label Loyalty</h1>
+                            <p className="text-slate-300 text-xs md:text-sm">Your premium supermarket experience</p>
+                        </div>
+                        {/* Mobile Cart Badge */}
+                        <div className="md:hidden relative">
+                            <ShoppingBag className="h-8 w-8 text-white" />
+                            {itemCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                                    {itemCount}
+                                </span>
+                            )}
+                        </div>
                     </div>
-                    <div className="ml-auto flex items-center gap-3">
-                        <input className="input w-64" placeholder="Search products…" value={query}
-                            onChange={e => setQuery(e.target.value)} aria-label="Search products" />
-                        <a href="/admin" className="text-sm text-slate-800 hover:text-slate-600">
+                    <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto md:ml-auto">
+                        <div className="relative flex-1 md:flex-none">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-5 w-5 text-slate-400" />
+                            </div>
+                            <input
+                                className="w-full md:w-80 pl-10 pr-10 py-2 md:py-3 rounded-xl border border-slate-300 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-slate-900 placeholder-slate-400"
+                                placeholder="Search products…"
+                                value={query}
+                                onChange={e => setQuery(e.target.value)}
+                                aria-label="Search products"
+                            />
+                            {query && (
+                                <button
+                                    onClick={() => setQuery('')}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-slate-600 transition-colors"
+                                    aria-label="Clear search"
+                                >
+                                    <X className="h-5 w-5 text-slate-400" />
+                                </button>
+                            )}
+                        </div>
+                        <a href="/admin" className="px-3 py-2 md:px-4 md:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg text-sm md:text-base">
                             Admin
                         </a>
                     </div>
                 </div>
             </header>
 
-            <main className="mx-auto max-w-7xl p-4 grid grid-cols-4 gap-6">
-                <section className="col-span-3"><ProductGrid products={filtered} /></section>
-                <section className="col-span-1"><CartPage /></section>
+            <main className="mx-auto max-w-7xl p-4 md:p-8 grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+                <section className="lg:col-span-3 order-2 lg:order-1">
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <h2 className="text-2xl md:text-3xl font-bold text-slate-800">Our Products</h2>
+                            {debouncedQuery && (
+                                <div className="text-sm text-slate-600">
+                                    {filtered.length} result{filtered.length !== 1 ? 's' : ''} for "{debouncedQuery}"
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-slate-600 mb-4">Discover our premium selection of quality products</p>
+
+                        {/* Category Filter */}
+                        {categories.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                <button
+                                    onClick={() => setSelectedCategory('')}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${!selectedCategory
+                                            ? 'bg-slate-800 text-white shadow-md'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    All Categories
+                                </button>
+                                {categories.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => setSelectedCategory(category)}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedCategory === category
+                                                ? 'bg-slate-800 text-white shadow-md'
+                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        {category}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <ProductGrid products={filtered} isSearch={Boolean(query || selectedCategory)} />
+                </section>
+                <section className="lg:col-span-1 order-1 lg:order-2">
+                    <CartPage />
+                </section>
             </main>
 
             <footer className="bg-slate-800 text-white mt-16">
@@ -59,9 +163,9 @@ export default function Home() {
                         <div>
                             <h3 className="font-semibold mb-4">Products</h3>
                             <ul className="space-y-2 text-sm text-gray-300">
-                                <li><a href="#" className="hover:text-white">Vegetables</a></li>
-                                <li><a href="#" className="hover:text-white">Pets</a></li>
-                                <li><a href="#" className="hover:text-white">Pastries</a></li>
+                                <li><button className="hover:text-white">Vegetables</button></li>
+                                <li><button className="hover:text-white">Pets</button></li>
+                                <li><button className="hover:text-white">Pastries</button></li>
                             </ul>
                         </div>
 
@@ -69,9 +173,9 @@ export default function Home() {
                         <div>
                             <h3 className="font-semibold mb-4">Here to help</h3>
                             <ul className="space-y-2 text-sm text-gray-300">
-                                <li><a href="#" className="hover:text-white">My Account</a></li>
-                                <li><a href="#" className="hover:text-white">Help & FAQs</a></li>
-                                <li><a href="#" className="hover:text-white">White Label Magazine</a></li>
+                                <li><button className="hover:text-white">My Account</button></li>
+                                <li><button className="hover:text-white">Help & FAQs</button></li>
+                                <li><button className="hover:text-white">White Label Magazine</button></li>
 
                             </ul>
                         </div>
@@ -80,11 +184,11 @@ export default function Home() {
                         <div>
                             <h3 className="font-semibold mb-4">About</h3>
                             <ul className="space-y-2 text-sm text-gray-300">
-                                <li><a href="#" className="hover:text-white">General terms & conditions</a></li>
-                                <li><a href="#" className="hover:text-white">Ratings & reviews policy</a></li>
-                                <li><a href="#" className="hover:text-white">Product terms & conditions</a></li>
-                                <li><a href="#" className="hover:text-white">Cookie settings</a></li>
-                                <li><a href="#" className="hover:text-white">Discount terms & conditions</a></li>
+                                <li><button className="hover:text-white">General terms & conditions</button></li>
+                                <li><button className="hover:text-white">Ratings & reviews policy</button></li>
+                                <li><button className="hover:text-white">Product terms & conditions</button></li>
+                                <li><button className="hover:text-white">Cookie settings</button></li>
+                                <li><button className="hover:text-white">Discount terms & conditions</button></li>
 
                             </ul>
                         </div>
@@ -116,18 +220,18 @@ export default function Home() {
 
                             {/* Social Media Icons */}
                             <div className="flex gap-3 mt-4">
-                                <a href="#" className="text-gray-300 hover:text-white">
+                                <button className="text-gray-300 hover:text-white">
                                     <span className="text-xl">📧</span>
-                                </a>
-                                <a href="#" className="text-gray-300 hover:text-white">
+                                </button>
+                                <button className="text-gray-300 hover:text-white">
                                     <span className="text-xl">📘</span>
-                                </a>
-                                <a href="#" className="text-gray-300 hover:text-white">
+                                </button>
+                                <button className="text-gray-300 hover:text-white">
                                     <span className="text-xl">🐦</span>
-                                </a>
-                                <a href="#" className="text-gray-300 hover:text-white">
+                                </button>
+                                <button className="text-gray-300 hover:text-white">
                                     <span className="text-xl">📺</span>
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -169,6 +273,7 @@ export default function Home() {
                     </div>
                 </div>
             </footer>
+            <ToastContainer />
         </div>
     );
 }

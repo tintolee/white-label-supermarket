@@ -10,6 +10,7 @@ type State = {
     remove: (id: string) => void;
     clear: () => void;
     totals: () => { subtotal: number; discount: number; total: number };
+    itemCount: () => number;
 };
 
 export const useCart = create<State>()((set, get) => ({
@@ -41,5 +42,8 @@ export const useCart = create<State>()((set, get) => ({
             discount: +discount.toFixed(2),
             total: +total.toFixed(2),
         };
+    },
+    itemCount: () => {
+        return Object.values(get().lines).reduce((total, line) => total + line.qty, 0);
     },
 }));

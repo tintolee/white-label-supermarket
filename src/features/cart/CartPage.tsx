@@ -13,35 +13,37 @@ export default function CartPage() {
     };
 
     return (
-        <aside className="max-w-md w-full border p-1 pb-6 bg-gray-50 rounded">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2 pb-4 border-b border-gray-300">
-                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center">
-                    <ShoppingCart className="text-white w-5 h-5" />
+        <aside className="sticky top-8 max-w-md w-full bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-xl rounded-2xl p-6 pb-8">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 pb-4 border-b border-gray-200">
+                <div className="w-10 h-10 bg-gradient-to-r from-slate-800 to-slate-900 rounded-full flex items-center justify-center shadow-lg">
+                    <ShoppingCart className="text-white w-6 h-6" />
                 </div>
-                Basket
+                <span className="bg-gradient-to-r from-slate-800 to-slate-900 bg-clip-text text-transparent">
+                    Basket
+                </span>
             </h2>
 
             {/* Discount Promotion Banner */}
-            <div className={`mb-4 p-3 rounded-lg border flex items-center gap-2 text-sm ${t.subtotal > DISCOUNT_THRESHOLD
-                ? 'bg-green-50 border-green-200 text-green-800'
-                : 'bg-blue-50 border-blue-200 text-blue-800'
+            <div className={`mb-6 p-4 rounded-xl border-2 flex items-center gap-3 text-sm shadow-md ${t.subtotal > DISCOUNT_THRESHOLD
+                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 text-green-800'
+                : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-800'
                 }`}>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${t.subtotal > DISCOUNT_THRESHOLD ? 'bg-green-200' : 'bg-blue-200'
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${t.subtotal > DISCOUNT_THRESHOLD ? 'bg-gradient-to-r from-green-200 to-emerald-200' : 'bg-gradient-to-r from-blue-200 to-indigo-200'
                     }`}>
                     {t.subtotal > DISCOUNT_THRESHOLD ? (
-                        <Gift className="w-4 h-4" />
+                        <Gift className="w-5 h-5" />
                     ) : (
-                        <Tag className="w-4 h-4" />
+                        <Tag className="w-5 h-5" />
                     )}
                 </div>
-                <div>
+                <div className="flex-1">
                     {t.subtotal > DISCOUNT_THRESHOLD ? (
-                        <div className="font-medium">🎉 20% discount applied!</div>
+                        <div className="font-bold text-base">🎉 20% discount applied!</div>
                     ) : (
                         <div>
-                            <div className="font-medium">Spend over £{DISCOUNT_THRESHOLD} for 20% off</div>
+                            <div className="font-bold">Spend over £{DISCOUNT_THRESHOLD} for 20% off</div>
                             {t.subtotal > 0 && (
-                                <div className="text-xs opacity-75">
+                                <div className="text-xs opacity-75 mt-1">
                                     {t.subtotal <= DISCOUNT_THRESHOLD
                                         ? `Only £${(DISCOUNT_THRESHOLD - t.subtotal + 0.01).toFixed(2)} more to save!`
                                         : 'Discount applied!'
@@ -51,26 +53,43 @@ export default function CartPage() {
                         </div>
                     )}
                 </div>
-            </div>
+            </div>            {rows.length === 0 && (
+                <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ShoppingCart className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500 font-medium">No items yet</p>
+                    <p className="text-gray-400 text-sm">Click a product to add it</p>
+                </div>
+            )}
 
-            {rows.length === 0 && <p className="text-gray-500">No items yet. Click a product to add it.</p>}
-
-            <ul className="divide-y">
+            <ul className="space-y-4">
                 {rows.map((item) => (
-                    <li key={item.id} className="py-3 flex items-center justify-between">
-                        <div>
-                            <div className="font-medium">{item.name}</div>
-                            <div className="text-sm text-gray-500">Qty: {item.qty} × £{item.price.toFixed(2)}</div>
+                    <li key={item.id} className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-slate-800 truncate">{item.name}</div>
+                                <div className="text-sm text-gray-500">£{item.price.toFixed(2)} each</div>
+                            </div>
+                            <button
+                                onClick={() => remove(item.id)}
+                                className="ml-3 px-3 py-1 text-red-600 hover:bg-red-50 rounded-md text-sm font-medium transition-colors duration-200 flex-shrink-0"
+                            >
+                                Remove
+                            </button>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="number"
-                                min={1}
-                                value={item.qty}
-                                onChange={(e) => setQty(item.id, Math.max(1, Number(e.target.value)))}
-                                className="w-16 input"
-                            />
-                            <button onClick={() => remove(item.id)} className="text-red-600 text-sm">Remove</button>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    min={1}
+                                    value={item.qty}
+                                    onChange={(e) => setQty(item.id, Math.max(1, Number(e.target.value)))}
+                                    className="w-16 px-2 py-1 border border-gray-300 rounded-md text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <span className="text-sm text-gray-600">×</span>
+                                <span className="font-semibold text-slate-800">£{(item.price * item.qty).toFixed(2)}</span>
+                            </div>
                         </div>
                     </li>
                 ))}
@@ -78,15 +97,33 @@ export default function CartPage() {
 
             {rows.length > 0 && (
                 <>
-                    <div className="mt-6 pt-4 border-t border-gray-300 space-y-1 text-right">
-                        <div>Subtotal: <b>£{t.subtotal.toFixed(2)}</b></div>
-                        {t.discount > 0 && <div className="text-green-600">Discount: -£{t.discount.toFixed(2)}</div>}
-                        <div className="text-lg">Total: <b>£{t.total.toFixed(2)}</b></div>
+                    <div className="mt-8 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-slate-700">
+                                <span>Subtotal:</span>
+                                <span className="font-semibold">£{t.subtotal.toFixed(2)}</span>
+                            </div>
+                            {t.discount > 0 && (
+                                <div className="flex justify-between text-green-700">
+                                    <span>Discount (20%):</span>
+                                    <span className="font-semibold">-£{t.discount.toFixed(2)}</span>
+                                </div>
+                            )}
+                            <div className="border-t border-gray-300 pt-2 flex justify-between text-xl font-bold text-slate-800">
+                                <span>Total:</span>
+                                <span>£{t.total.toFixed(2)}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="mt-6 flex gap-3 justify-center">
-                        <button className="px-6 py-2 bg-gray-200 rounded-full hover:opacity-90 disabled:opacity-50" onClick={clear}>Clear Basket</button>
+                    <div className="mt-6 flex gap-3">
                         <button
-                            className="px-6 py-2 bg-slate-800 text-white rounded-full hover:bg-slate-700 disabled:bg-gray-300 disabled:text-gray-500"
+                            className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors duration-200"
+                            onClick={clear}
+                        >
+                            Clear Basket
+                        </button>
+                        <button
+                            className="flex-1 px-6 py-3 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl font-medium hover:from-slate-900 hover:to-black transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
                             onClick={handleCheckout}
                             disabled={rows.length === 0}
                         >
