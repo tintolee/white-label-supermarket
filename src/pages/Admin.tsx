@@ -12,7 +12,6 @@ export default function Admin() {
 
     const handleSignIn = (e: React.FormEvent) => {
         e.preventDefault();
-        // Simple validation - in a real app, this would be more secure
         if (username.trim() && password.trim()) {
             setIsSignedIn(true);
         } else {

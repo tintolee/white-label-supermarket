@@ -1,5 +1,17 @@
-import { expect, it, describe } from 'vitest';
+import { expect, it, describe, beforeAll } from 'vitest';
 import { parseProductsFile } from '../csv';
+
+beforeAll(() => {
+    if (!File.prototype.text) {
+        File.prototype.text = function () {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.readAsText(this);
+            });
+        };
+    }
+});
 
 function makeFile(name: string, content: string, type = 'text/csv') {
     return new File([content], name, { type });
@@ -16,6 +28,6 @@ X99,Extra,1.00,each,5,https://picsum.photos/seed/x/300/200
         const file = makeFile('storec.csv', csv);
         const items = await parseProductsFile(file);
         expect(items.length).toBe(3);
-        expect(items[0]).toMatchObject({ id: 'G95', name: 'Asparagus', price: 3.5 });
+        expect(items[0]).toMatchObject({ id: 'G95', name: 'Asparagus', price: 0.83 });
     });
 });

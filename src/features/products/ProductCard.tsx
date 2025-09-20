@@ -52,11 +52,6 @@ export default function ProductCard({ p }: { readonly p: Product }) {
                     }}
                     loading="lazy"
                 />
-                {p.promotion === 'BOGOF' && (
-                    <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-2 rounded-full shadow-lg transform rotate-12 animate-pulse hover:animate-bounce">
-                        BUY 1 GET 1 FREE!
-                    </div>
-                )}
             </div>
             {p.category && (
                 <span className="mt-4 inline-block px-3 py-1.5 text-xs bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 rounded-full w-fit font-medium shadow-sm border border-blue-200">
@@ -70,7 +65,9 @@ export default function ProductCard({ p }: { readonly p: Product }) {
                     <div className="flex items-baseline gap-2">
                         <span className="line-through text-sm text-gray-400">£{p.price.toFixed(2)}</span>
                         <span className="text-xl font-bold text-slate-800">£{price.toFixed(2)}</span>
-                        <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">SALE</span>
+                        <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                            {p.promotion === 'BOGOF' ? 'Buy 1 Get 1 Free' : 'SALE'}
+                        </span>
                     </div>
                 ) : (
                     <span className="text-xl font-bold text-slate-800">£{price.toFixed(2)}</span>

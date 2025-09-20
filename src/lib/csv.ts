@@ -10,32 +10,51 @@ export async function parseProductsFile(file: File): Promise<Product[]> {
 
 async function parseCSV(file: File) {
     const text = await file.text();
-    return Papa.parse<any>(text, { header: true, skipEmptyLines: true }).data;
+    return Papa.parse<Record<string, unknown>>(text, { header: true, skipEmptyLines: true }).data;
 }
 
 async function parseXLSX(file: File) {
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf);
     const ws = wb.Sheets[wb.SheetNames[0]];
-    return XLSX.utils.sheet_to_json<any>(ws, { defval: '' });
+    return XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' });
 }
 
-function normalize(rows: any[]): Product[] {
+function normalize(rows: Record<string, unknown>[]): Product[] {
     return rows.map((r, i) => {
-        const price = Number(String(r.price ?? r.Price ?? '').replace(/[^\d.-]/g, '')) || 0;
-        const stockStr = String(r.stock ?? r.Stock ?? '1').toLowerCase();
-        const stock = stockStr === 'false' || stockStr === 'no' || stockStr === '0' ? 0 : Number(stockStr) || 1;
+        const getStringValue = (value: unknown): string => {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'string') return value;
+            if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+            return '';
+        };
+
+        const getNumericValue = (value: unknown): number => {
+            if (value === null || value === undefined) return 0;
+            if (typeof value === 'number') return value;
+            if (typeof value === 'string') {
+                const str = value.replace(/[^\d.-]/g, '');
+                return Number(str) || 0;
+            }
+            return 0;
+        };
+
+        const price = getNumericValue(r.price ?? r.Price);
+        const stockValue = r.stock ?? r.Stock ?? '1';
+        const stockStr = getStringValue(stockValue).toLowerCase();
+        const stock = stockStr === 'false' || stockStr === 'no' || stockStr === '0' ? 0 : getNumericValue(stockValue);
+
         return {
-            id: String(r.id ?? r.ID ?? i),
-            name: String(r.name ?? r.Name ?? '').trim(),
+            id: getStringValue(r.id ?? r.ID) || String(i),
+            name: getStringValue(r.name ?? r.Name).trim(),
             price,
-            salePrice: r.salePrice ? Number(r.salePrice) : undefined,
-            unit: String(r.unit ?? r.Unit ?? 'each'),
+            salePrice: r.salePrice ? getNumericValue(r.salePrice) : undefined,
+            unit: getStringValue(r.unit ?? r.Unit) || 'each',
             stock,
-            image: String(r.image ?? r.Image ?? ''),
-            category: String(r.category ?? r.Category ?? '').trim() || undefined,
-            promotion: String(r.promotion ?? r.Promotion ?? '').trim() || undefined,
-            description: String(r.description ?? r.Description ?? '').trim() || undefined,
+            image: getStringValue(r.image ?? r.Image),
+            category: getStringValue(r.category ?? r.Category).trim() || undefined,
+            promotion: getStringValue(r.promotion ?? r.Promotion).trim() || undefined,
+            description: getStringValue(r.description ?? r.Description).trim() || undefined,
         };
     }).filter(p => p.name);
 }

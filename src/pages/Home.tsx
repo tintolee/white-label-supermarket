@@ -1,30 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Search, X, ShoppingBag } from 'lucide-react';
+import { Search, ShoppingBag } from 'lucide-react';
 import type { Product } from '../types';
 import { parseProductsFile } from '../lib/csv';
 import ProductGrid from '../features/products/ProductGrid';
 import CartPage from '../features/cart/CartPage';
 import { useCart } from '../features/cart/cartStore';
 import { ToastContainer } from '../lib/toast';
+import { useDebounce } from '../hooks/useDebounce';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 import sampleUrl from '../data/products.csv?url';
 import logoUrl from '../assets/whitelabel_loyalty_logo.jpeg';
-
-// Custom hook for debounced value
-function useDebounce<T>(value: T, delay: number): T {
-    const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
-
-    return debouncedValue;
-}
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -32,7 +18,6 @@ export default function Home() {
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const itemCount = useCart((s) => s.itemCount());
 
-    // Debounce search to improve performance
     const debouncedQuery = useDebounce(query, 300);
 
     useEffect(() => {
@@ -63,7 +48,6 @@ export default function Home() {
                             <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">White Label Loyalty</h1>
                             <p className="text-slate-300 text-xs md:text-sm">Your premium supermarket experience</p>
                         </div>
-                        {/* Mobile Cart Badge */}
                         <div className="md:hidden relative">
                             <ShoppingBag className="h-8 w-8 text-white" />
                             {itemCount > 0 && (
@@ -74,26 +58,17 @@ export default function Home() {
                         </div>
                     </div>
                     <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto md:ml-auto">
-                        <div className="relative flex-1 md:flex-none">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-5 w-5 text-slate-400" />
-                            </div>
-                            <input
-                                className="w-full md:w-80 pl-10 pr-10 py-2 md:py-3 rounded-xl border border-slate-300 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-slate-900 placeholder-slate-400"
+                        <div className="flex-1 md:flex-none">
+                            <Input
+                                className="w-full md:w-80"
                                 placeholder="Search products…"
                                 value={query}
                                 onChange={e => setQuery(e.target.value)}
+                                startIcon={<Search className="h-5 w-5 text-slate-400" />}
+                                clearable
+                                onClear={() => setQuery('')}
                                 aria-label="Search products"
                             />
-                            {query && (
-                                <button
-                                    onClick={() => setQuery('')}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-slate-600 transition-colors"
-                                    aria-label="Clear search"
-                                >
-                                    <X className="h-5 w-5 text-slate-400" />
-                                </button>
-                            )}
                         </div>
                         <a href="/admin" className="px-3 py-2 md:px-4 md:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg text-sm md:text-base">
                             Admin
@@ -115,29 +90,24 @@ export default function Home() {
                         </div>
                         <p className="text-slate-600 mb-4">Discover our premium selection of quality products</p>
 
-                        {/* Category Filter */}
                         {categories.length > 0 && (
                             <div className="flex flex-wrap gap-2 mb-6">
-                                <button
+                                <Button
+                                    variant="pill"
+                                    active={!selectedCategory}
                                     onClick={() => setSelectedCategory('')}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${!selectedCategory
-                                            ? 'bg-slate-800 text-white shadow-md'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                        }`}
                                 >
                                     All Categories
-                                </button>
+                                </Button>
                                 {categories.map((category) => (
-                                    <button
+                                    <Button
                                         key={category}
+                                        variant="pill"
+                                        active={selectedCategory === category}
                                         onClick={() => setSelectedCategory(category)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedCategory === category
-                                                ? 'bg-slate-800 text-white shadow-md'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
                                     >
                                         {category}
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         )}
@@ -152,14 +122,12 @@ export default function Home() {
             <footer className="bg-slate-800 text-white mt-16">
                 <div className="mx-auto max-w-7xl p-8">
                     <div className="grid grid-cols-5 gap-8 mb-8">
-                        {/* Logo and Company Info */}
                         <div className="col-span-1">
                             <div className="flex items-center justify-center mb-4">
                                 <img src={logoUrl} alt="White Label Loyalty" className="h-12 w-12 object-contain" />
                             </div>
                         </div>
 
-                        {/* Products */}
                         <div>
                             <h3 className="font-semibold mb-4">Products</h3>
                             <ul className="space-y-2 text-sm text-gray-300">
@@ -169,7 +137,6 @@ export default function Home() {
                             </ul>
                         </div>
 
-                        {/* Solutions */}
                         <div>
                             <h3 className="font-semibold mb-4">Here to help</h3>
                             <ul className="space-y-2 text-sm text-gray-300">
@@ -180,7 +147,6 @@ export default function Home() {
                             </ul>
                         </div>
 
-                        {/* Resources */}
                         <div>
                             <h3 className="font-semibold mb-4">About</h3>
                             <ul className="space-y-2 text-sm text-gray-300">
@@ -193,7 +159,6 @@ export default function Home() {
                             </ul>
                         </div>
 
-                        {/* Contact */}
                         <div>
                             <h3 className="font-semibold mb-4">Contact Us</h3>
                             <div className="space-y-3 text-sm text-gray-300">
@@ -218,7 +183,6 @@ export default function Home() {
                                 </div>
                             </div>
 
-                            {/* Social Media Icons */}
                             <div className="flex gap-3 mt-4">
                                 <button className="text-gray-300 hover:text-white">
                                     <span className="text-xl">📧</span>
@@ -236,7 +200,6 @@ export default function Home() {
                         </div>
                     </div>
 
-                    {/* Awards/Certifications Section */}
                     <div className="border-t border-gray-700 pt-6 mb-6">
                         <div className="flex items-center justify-center gap-8 opacity-60">
                             <div className="text-xs text-center">
@@ -267,7 +230,6 @@ export default function Home() {
                         </div>
                     </div>
 
-                    {/* Copyright */}
                     <div className="border-t border-gray-700 pt-4 text-center text-sm text-gray-400">
                         © {new Date().getFullYear()} Oluwatosin Adelaja
                     </div>

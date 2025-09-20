@@ -40,7 +40,6 @@ export function useToast() {
             toastState.toasts = [...toastState.toasts, newToast];
             listeners.forEach(listener => listener());
 
-            // Auto remove after duration
             const timeoutId = setTimeout(() => {
                 toastState.toasts = toastState.toasts.filter(t => t.id !== id);
                 timeouts.delete(id);
@@ -50,7 +49,6 @@ export function useToast() {
             timeouts.set(id, timeoutId);
         },
         removeToast: (id: string) => {
-            // Clear any pending timeout for this toast
             const timeoutId = timeouts.get(id);
             if (timeoutId) {
                 clearTimeout(timeoutId);

@@ -1,6 +1,7 @@
 import { useCart } from './cartStore';
 import { ShoppingCart, Tag, Gift } from 'lucide-react';
 import { DISCOUNT_THRESHOLD } from '../../app/config';
+import Button from '../../components/ui/Button';
 
 export default function CartPage() {
     const { lines, setQty, remove, clear, totals } = useCart();
@@ -8,7 +9,6 @@ export default function CartPage() {
     const rows = Object.values(lines);
 
     const handleCheckout = () => {
-        // For now, just show an alert. In a real app, this would redirect to checkout
         alert(`Proceeding to checkout with ${rows.length} item(s). Total: £${t.total.toFixed(2)}`);
     };
 
@@ -23,7 +23,6 @@ export default function CartPage() {
                 </span>
             </h2>
 
-            {/* Discount Promotion Banner */}
             <div className={`mb-6 p-4 rounded-xl border-2 flex items-center gap-3 text-sm shadow-md ${t.subtotal > DISCOUNT_THRESHOLD
                 ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 text-green-800'
                 : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-800'
@@ -71,12 +70,14 @@ export default function CartPage() {
                                 <div className="font-semibold text-slate-800 truncate">{item.name}</div>
                                 <div className="text-sm text-gray-500">£{item.price.toFixed(2)} each</div>
                             </div>
-                            <button
+                            <Button
+                                variant="danger"
+                                size="sm"
                                 onClick={() => remove(item.id)}
-                                className="ml-3 px-3 py-1 text-red-600 hover:bg-red-50 rounded-md text-sm font-medium transition-colors duration-200 flex-shrink-0"
+                                className="ml-3 flex-shrink-0"
                             >
                                 Remove
-                            </button>
+                            </Button>
                         </div>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -116,19 +117,21 @@ export default function CartPage() {
                         </div>
                     </div>
                     <div className="mt-6 flex gap-3">
-                        <button
-                            className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors duration-200"
+                        <Button
+                            variant="secondary"
+                            className="flex-1"
                             onClick={clear}
                         >
                             Clear Basket
-                        </button>
-                        <button
-                            className="flex-1 px-6 py-3 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl font-medium hover:from-slate-900 hover:to-black transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                        </Button>
+                        <Button
+                            variant="primary"
+                            className="flex-1"
                             onClick={handleCheckout}
                             disabled={rows.length === 0}
                         >
                             Checkout
-                        </button>
+                        </Button>
                     </div>
                 </>
             )}

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BOGOF_ID, DISCOUNT_RATE, DISCOUNT_THRESHOLD } from '../../app/config';
+import { DISCOUNT_RATE, DISCOUNT_THRESHOLD } from '../../app/config';
 
 type Line = { id: string; name: string; price: number; unit?: string; qty: number };
 
@@ -28,12 +28,7 @@ export const useCart = create<State>()((set, get) => ({
     totals: () => {
         let subtotal = 0;
         Object.values(get().lines).forEach((line) => {
-            if (line.id === BOGOF_ID) {
-                const chargeable = Math.ceil(line.qty / 2);
-                subtotal += line.price * chargeable;
-            } else {
-                subtotal += line.price * line.qty;
-            }
+            subtotal += line.price * line.qty;
         });
         const discount = subtotal > DISCOUNT_THRESHOLD ? subtotal * DISCOUNT_RATE : 0;
         const total = subtotal - discount;
