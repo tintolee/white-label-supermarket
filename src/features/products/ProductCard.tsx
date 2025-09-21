@@ -1,6 +1,6 @@
 import type { Product } from '../../types';
 import { useCart } from '../cart/cartStore';
-import { useToast } from '../../lib/toast';
+import { useToast } from '../../hooks/useToast';
 
 export default function ProductCard({ p }: { readonly p: Product }) {
     const add = useCart((s) => s.add);

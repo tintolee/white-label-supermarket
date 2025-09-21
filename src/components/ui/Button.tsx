@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { GRADIENTS, SHADOWS, TRANSFORMS } from '../../lib/styles';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'pill';
@@ -17,7 +17,7 @@ const buttonVariants: Record<ButtonVariant, string> = {
     secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
     danger: 'bg-red-50 text-red-600 hover:bg-red-100',
     ghost: 'bg-transparent text-gray-300 hover:text-white',
-    pill: '' // Will be handled separately based on active state
+    pill: ''
 };
 
 const buttonSizes: Record<ButtonSize, string> = {
